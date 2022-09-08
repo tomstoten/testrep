@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import math
 
 class my2DPlot:
 	def __init__(self, f, a, b):
