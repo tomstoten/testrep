@@ -21,6 +21,9 @@ class Iteration1D:
       self.pstar = None
       # iters for newton
       self.p_iters = None
+      # final iteration count
+      self.count = None
+      self.appxs = None
 
     def root(self):
 
@@ -29,7 +32,7 @@ class Iteration1D:
            self.tol is None or self.Nmax is None:
           print('error: some attributes for bisection aresys. returning ..')
           return
-        [self.pstar, self.info] = bisection(self.f,self.a,self.b,self.tol,self.Nmax)
+        [self.pstar, self.info, self.count] = bisection(self.f,self.a,self.b,self.tol,self.Nmax)
 
       elif self.method == 'newton':
         if self.fp is None or self.p0 is None or \
@@ -44,9 +47,9 @@ class Iteration1D:
         if self.p0 is None or self.tol is None or self.Nmax is None:
           print('error: some attributes for fixedpt are unset. returning ..')
           return 
-        [self.pstar,self.info] = fixedpt(self.f,self.p0,self.tol,self.Nmax)
+        [self.pstar, self.appxs, self.info, self.count] = fixedpt(self.f,self.p0,self.tol,self.Nmax)
       
-      return self.pstar
+      return self.pstar, self.count
 
 
 def newton(f,fp,p0,tol,Nmax):
@@ -98,11 +101,13 @@ def bisection(f,a,b,tol,Nmax):
     '''
      first verify there is a root we can find in the interval
     '''
+    count = 0
+
     fa = f(a); fb = f(b)
     if (fa*fb>0):
        ier = 1
        astar = a
-       return [astar, ier]
+       return [astar, ier, count]
 
     '''
      verify end point is not a root
@@ -110,14 +115,13 @@ def bisection(f,a,b,tol,Nmax):
     if (fa == 0):
       astar = a
       ier =0
-      return [astar, ier]
+      return [astar, ier, count]
 
     if (fb ==0):
       astar = b
       ier = 0
-      return [astar, ier]
+      return [astar, ier, count]
 
-    count = 0
     while (count < Nmax):
       c = 0.5*(a+b)
       fc = f(c)
@@ -125,7 +129,7 @@ def bisection(f,a,b,tol,Nmax):
       if (fc ==0):
         astar = c
         ier = 0
-        return [astar, ier]
+        return [astar, ier, count]
 
       if (fa*fc<0):
          b = c
@@ -135,18 +139,18 @@ def bisection(f,a,b,tol,Nmax):
       else:
         astar = c
         ier = 3
-        return [astar, ier]
+        return [astar, ier, count]
 
       if (abs(b-a)<tol):
         astar = a
         ier =0
-        return [astar, ier]
+        return [astar, ier, count]
       
       count = count +1
 
     astar = a
     ier = 2
-    return [astar,ier] 
+    return [astar,ier,count] 
 
 
 def fixedpt(f,x0,tol,Nmax):
@@ -156,15 +160,22 @@ def fixedpt(f,x0,tol,Nmax):
     ''' tol = stopping tolerance'''
 
     count = 0
+
+    x = np.zeros((Nmax,1))
+
+    x[0] = x0
     while (count <Nmax):
-       count = count +1
-       x1 = f(x0)
-       if (abs(x1-x0) <tol):
-          xstar = x1
-          ier = 0
-          return [xstar,ier]
-       x0 = x1
+      count = count +1
+      x1 = f(x0)
+      x[count] = x1
+      if (abs(x1-x0)/abs(x1) < 0.5*tol):  # relative error now
+        xstar = x1
+        ier = 0
+        x = x[0:count]
+        return [xstar,x,ier,count]
+      x0 = x1
 
     xstar = x1
     ier = 1
-    return [xstar, ier]
+    x = x[0:count]
+    return [xstar, x, ier, count]
