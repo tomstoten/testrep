@@ -12,6 +12,7 @@ class Iteration1D:
       self.b = None
       # initial guess for newton/fixpt
       self.p0 = None
+      self.fp = None
       # tolerances and max iter
       self.tol = None
       self.Nmax = None
@@ -40,8 +41,16 @@ class Iteration1D:
           print('error: some attributes for newton are unset. returning ..')
           return
 
-        [self.p_iters, self.pstar, self.info, it] = \
+        [self.p_iters, self.pstar, self.info, self.count] = \
           newton(self.f,self.fp,self.p0,self.tol,self.Nmax)
+      elif self.method == 'secant':
+        if self.a is None or self.b is None or self.p0 is None or \
+           self.tol is None or self.Nmax is None:
+          print('error: some attributes for newton are unset. returning ..')
+          return
+
+        [self.p_iters, self.pstar, self.info, self.count] = \
+          secant(self.f,self.a,self.b,self.tol,self.Nmax)
 
       elif self.method == 'fixedpt':
         if self.p0 is None or self.tol is None or self.Nmax is None:
@@ -49,7 +58,26 @@ class Iteration1D:
           return 
         [self.pstar, self.appxs, self.info, self.count] = fixedpt(self.f,self.p0,self.tol,self.Nmax)
       
-      return self.pstar, self.count
+      return self.p_iters, self.pstar, self.info, self.count
+
+
+def secant(f, a, b, tol, Nmax):
+  p = np.zeros(Nmax+1)
+  p[0] = a
+  p[1] = b
+  for i in range(1, Nmax):
+    pn = p[i]
+    pm1 = p[i-1]
+    pn1 = pm1 - (f(pm1) * (pn-pm1) / (f(pn) - f(pm1)))
+    p[i+1] = pn1
+    if abs(pn1 - pn) < tol:
+      pstar = pn1
+      ier = 0
+      p = p[:i+2]
+      return [p, pstar, ier, i]
+  pstar = pn1
+  info = 1
+  return [p,pstar,info,i]
 
 
 def newton(f,fp,p0,tol,Nmax):
@@ -77,6 +105,7 @@ def newton(f,fp,p0,tol,Nmax):
       if (abs(p1-p0) < tol):
           pstar = p1
           info = 0
+          p = p[:it+1]
           return [p,pstar,info,it]
       p0 = p1
   pstar = p1
