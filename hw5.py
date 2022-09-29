@@ -15,8 +15,7 @@ def iterate(F, xn, A, tol, nmax):
 
 def newton2D(F, xn, A, tol, nmax):
     for i in range(nmax):
-        Jn = [[f(xn) for f in A[0]],
-              [f(xn) for f in A[1]]]
+        Jn = [[f(xn) for f in A[r]] for r in range(len(xn))]
         Jn_i = np.linalg.inv(Jn)
         xn1 = xn - np.matmul(Jn_i, [f(xn) for f in F])
         if(np.linalg.norm(xn1 - xn) < tol):
