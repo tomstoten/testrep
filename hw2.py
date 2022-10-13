@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from prini import prini as prin
+#from prini import prini as prin
 import matplotlib.pyplot as plt
 import random
 
@@ -49,11 +49,11 @@ if __name__ == '__main__':
     y_ = np.cos(t)
 
     
-    pr = prin("real", "the sum is:", sum(31, t, y_))
-    pr.print()
+    #pr = prin("real", "the sum is:", sum(31, t, y_))
+    #pr.print()
 
 
-    thetas = np.linspace(0, 2, 200)
+    thetas = np.linspace(0, 2*np.pi, 200)
     
     fig, ax = plt.subplots()
     #xv = x(thetas)
@@ -65,7 +65,7 @@ if __name__ == '__main__':
         ax.plot(xv, yv)
     #ax.plot(xv, yv)
     #ax.set(xlim=(-1, 2), ylim=(-1, 2))
-    plt.savefig('hw2_p5(2).pdf')
+    #plt.savefig('hw2_p5(2).pdf')
     plt.show()
     
     #print(t)
