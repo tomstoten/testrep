@@ -5,7 +5,7 @@ import random
 
 f = lambda x: 1.0/(1. + (10.*x)**2)
 
-N = 5
+N = 20
 X = np.linspace(-1, 1, N+1)
 
 Neval = 1000
@@ -58,14 +58,15 @@ def driver():
         
     fig,ax = plt.subplots(1,2)
     ax[0].plot(xeval,fex,'b-')
-    ax[0].plot(xeval,yevalL,'r-')
-    ax[0].plot(xeval,yevalNDD,'y-')
+    ax[0].plot(xeval,yevalL,'ro')
+    #ax[0].plot(xeval,yevalNDD,'y-')
          
     errL = abs(yevalL-fex)
     errNDD = abs(yevalNDD-fex)
     ax[1].plot(xeval,errL,'r-')
-    ax[1].plot(xeval,errNDD,'y-')
+    #ax[1].plot(xeval,errNDD,'y-')
     ax[1].plot(Xeval, np.abs(Feval - Veval@c),'b-')
+    plt.savefig("hw7_1.pdf")
     plt.show()
 
 
